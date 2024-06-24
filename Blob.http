@@ -1,0 +1,6 @@
+@Blob_HostAddress = http://localhost:5198
+
+GET {{Blob_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
