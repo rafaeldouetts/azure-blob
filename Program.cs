@@ -30,22 +30,22 @@ if (app.Environment.IsDevelopment())
 app.MapPost("/Upload", async (IFormFile formFile) =>
 {
     var connectionString = configuration.GetConnectionString("blobstorage");
-    var containerName = "fidelidade";
+    var containerName = "";
 
     try
     {
         // Converte o arquivo em um array de bytes
         using var memoryStream = new MemoryStream();
-        // Lê a imagem do corpo da requisição        
+        // LÃª a imagem do corpo da requisiÃ§Ã£o        
         await formFile.CopyToAsync(memoryStream);
         var fileBytes = memoryStream.ToArray();
-        // Cria um objeto CloudStorageAccount a partir da string de conexão
+        // Cria um objeto CloudStorageAccount a partir da string de conexÃ£o
         var storageAccount = CloudStorageAccount.Parse(connectionString);
 
         // Cria um objeto CloudBlobClient a partir da conta de armazenamento
         var blobClient = storageAccount.CreateCloudBlobClient();
 
-        // Cria o contêiner caso ele não exista
+        // Cria o contÃªiner caso ele nÃ£o exista
         var container = blobClient.GetContainerReference(containerName);
         await container.CreateIfNotExistsAsync();
 
@@ -56,7 +56,7 @@ app.MapPost("/Upload", async (IFormFile formFile) =>
         var blob = container.GetBlockBlobReference(blobName);
         await blob.UploadFromByteArrayAsync(fileBytes, 0, fileBytes.Length);
 
-        // Obtém a URL de acesso ao blob
+        // ObtÃ©m a URL de acesso ao blob
         var blobUrl = blob.Uri.ToString();
         return Results.Ok(blobName);
     }
@@ -109,7 +109,7 @@ static async Task<string> GetBlobUrlWithSas(string blobName, IConfigurationRoot 
     // Cria um objeto CloudBlobClient a partir da conta de armazenamento
     var blobClient = storageAccount.CreateCloudBlobClient();
 
-    // Cria o contêiner caso ele não exista
+    // Cria o contÃªiner caso ele nÃ£o exista
     var container = blobClient.GetContainerReference(containerName);
     //await container.CreateIfNotExistsAsync();    
 
@@ -119,15 +119,15 @@ static async Task<string> GetBlobUrlWithSas(string blobName, IConfigurationRoot 
     var checkIfExists = await blob.ExistsAsync();
     if (!checkIfExists) return string.Empty;
 
-    // Obtém o SAS Token para o blob
+    // ObtÃ©m o SAS Token para o blob
     var sasToken = blob.GetSharedAccessSignature(new SharedAccessBlobPolicy
     {
-        SharedAccessExpiryTime = DateTimeOffset.UtcNow.AddHours(1), // Define o tempo de expiração do SAS Token
-        Permissions = SharedAccessBlobPermissions.Read // Define as permissões do SAS Token (somente leitura neste caso)
+        SharedAccessExpiryTime = DateTimeOffset.UtcNow.AddHours(1), // Define o tempo de expiraÃ§Ã£o do SAS Token
+        Permissions = SharedAccessBlobPermissions.Read // Define as permissÃµes do SAS Token (somente leitura neste caso)
     });
     //var sasToken = "sp=racwdl&st=2023-06-18T13:08:08Z&se=2023-06-23T21:08:08Z&spr=https&sv=2022-11-02&sr=c&sig=4njFIKcB7Ide2qD7voG%2ForlDZsF70qm51FYLOKIktGo%3D";
 
-    // Constrói a URL do blob com o SAS Token
+    // ConstrÃ³i a URL do blob com o SAS Token
     var blobUrlWithSas = blob.Uri + sasToken;
     return blobUrlWithSas;
 }
